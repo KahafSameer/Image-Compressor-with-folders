@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Batch Compressor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <span class="eyebrow">LOCAL IMAGE TOOL</span>
+      <h1>Compress image folders</h1>
+      <p>Your originals are never changed. Compressed copies are created separately.</p>
+    </header>
+
+    <section class="card">
+      <h2>Folders</h2>
+      <div class="folder-entry">
+        <input id="folderInput" type="text" placeholder="Paste a folder path">
+        <button id="addFolder" class="button secondary">Add</button>
+        <button id="browse" class="button secondary">Browse</button>
+      </div>
+      <ul id="folderList" class="folder-list"></ul>
+      <label class="check-row">
+        <input id="processSubfolders" type="checkbox">
+        <span>Process each immediate subfolder as a separate batch</span>
+      </label>
+      <div class="field">
+        <label for="outputDir">Custom output directory <span class="muted">(optional)</span></label>
+        <div class="folder-entry">
+          <input id="outputDir" type="text" placeholder="Leave blank to save beside each folder">
+          <button id="browseOutput" class="button secondary">Browse</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Compression settings</h2>
+      <div class="field quality-field">
+        <label for="quality">Quality <strong id="qualityValue">82</strong></label>
+        <input id="quality" type="range" min="60" max="95" value="82">
+        <div class="range-labels"><span>Smaller files</span><span>Higher quality</span></div>
+      </div>
+      <div class="settings-grid">
+        <label class="check-row"><input id="stripMetadata" type="checkbox" checked><span>Strip EXIF/GPS metadata</span></label>
+        <label class="check-row"><input id="quantizePng" type="checkbox"><span>Quantize PNG to 256 colors</span></label>
+        <label class="check-row"><input id="copyNonImages" type="checkbox"><span>Copy non-image files as-is</span></label>
+        <label class="check-row resize-check"><input id="resizeEnabled" type="checkbox"><span>Limit maximum width/height</span></label>
+      </div>
+      <div id="resizeSetting" class="field resize-setting hidden">
+        <label for="maxSize">Maximum dimension (pixels)</label>
+        <input id="maxSize" type="number" min="1" value="1920">
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="start-row">
+        <div><h2>Ready to compress?</h2><p id="statusText" class="muted">Choose one or more folders to begin.</p></div>
+        <button id="start" class="button primary">Start</button>
+      </div>
+      <div id="progressArea" class="hidden">
+        <div class="progress-label"><span id="progressTitle">Preparing…</span><span id="progressPercent">0%</span></div>
+        <progress id="progress" max="100" value="0"></progress>
+        <p id="currentFile" class="muted current-file"></p>
+      </div>
+    </section>
+    <section id="report" class="card hidden">
+      <h2>Compression report</h2>
+      <div id="reportContent"></div>
+    </section>
+    <div id="notice" role="status" class="notice hidden"></div>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
