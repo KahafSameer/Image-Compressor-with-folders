@@ -1,47 +1,101 @@
+<div align="center">
+
 # Local Image Batch Compressor
 
-A local Flask app that creates compressed copies of image folders. Original files are never modified or deleted. Images are processed concurrently in separate worker processes.
+**Shrink image folders in bulk. Keep your originals safe.**
 
-## Run on Windows
+A simple, local-first Flask app for compressing images and preserving the folder structure. No uploads, no cloud processing, and no changes to your source files.
 
-1. Install Python 3.10 or newer and open PowerShell in this project folder.
-2. Create and activate a virtual environment, then install dependencies:
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-local%20web%20app-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Pillow](https://img.shields.io/badge/Imaging-Pillow-8CAAE6)](https://python-pillow.org/)
 
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   python -m pip install -r requirements.txt
-   ```
+</div>
 
-3. Start the app and open the local address:
+## Preview
 
-   ```powershell
-   python app.py
-   ```
+![The Image Batch Compressor web interface](dashboard.png)
 
-   Visit <http://127.0.0.1:5000>. Use **Browse** for the native folder picker, or paste a folder path and press **Add**. By default, each selected folder is scanned recursively and its output is placed beside it as `folder_compressed`. Existing output names receive a numeric suffix. A custom existing output directory can be selected in the UI.
+## Before and after
 
-   The parent-folder option processes each immediate child folder as its own batch. Without it, a selected folder and its full nested structure form one batch.
+The sample images below show the visual output. The folder screenshots show the corresponding Windows properties before and after compression.
 
-## Compression behavior
+<p align="center">
+  <img src="before.jpg" alt="Sample image before compression" width="48%">
+  <img src="after.jpg" alt="Sample image after compression" width="48%">
+</p>
+<p align="center"><em>Before</em> &nbsp; · &nbsp; <em>After</em></p>
 
-- JPEG: quality 82 by default, optimized and progressive; WEBP: quality 82 and method 6.
-- PNG uses lossless optimization unless the optional 256-color quantization checkbox is enabled.
-- EXIF/GPS data is stripped by default. Resizing is disabled by default; when enabled, the image is fitted within the chosen maximum width and height without upscaling.
-- Unsupported formats and non-image files are skipped, unless copying non-images is enabled. Corrupt image files are reported without stopping the batch.
-- If an encoded image would be larger than its source, the original is copied into the output tree instead.
-- Optional HEIC/HEIF support: install `python -m pip install pillow-heif`. The app then reads and writes HEIC/HEIF in their original format.
+<p align="center">
+  <img src="beforecompressing.png" alt="Original folder properties before compression" width="48%">
+  <img src="aftercompressed.png" alt="Compressed folder properties after compression" width="48%">
+</p>
+<p align="center"><em>Original folder</em> &nbsp; · &nbsp; <em>Compressed folder</em></p>
 
-## CLI
+## Features
+
+- Compress multiple folders and keep their nested directory structure.
+- Choose whether each immediate subfolder is processed as a separate batch.
+- Adjust image quality and optionally resize images to a maximum dimension.
+- Optimize JPEG, PNG, and WebP images; optional HEIC/HEIF support is available with `pillow-heif`.
+- Optionally strip EXIF/GPS metadata, quantize PNGs, or copy non-image files.
+- View live progress and a report with file totals, space saved, and any failures.
+- Keep original files untouched. If compression would make an image larger, the original is copied to the output instead.
+- Run locally on your machine; images are not uploaded to a service.
+
+## Get started
+
+Requires Python 3.10 or newer.
+
+```powershell
+git clone https://github.com/KahafSameer/Image-Compressor-with-folders.git
+cd Image-Compressor-with-folders
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python app.py
+```
+
+Open <http://127.0.0.1:5000> in your browser. Add folders by pasting a path or using **Browse**, choose your settings, and select **Start**.
+
+By default, the app creates a new `folder_compressed` directory beside each source folder. If that name already exists, it uses a numbered suffix. You can also choose an existing custom output directory in the app.
+
+## Command line
+
+Compress one or more folders without opening the web interface:
 
 ```powershell
 python compressor.py "C:\photos\trip" "D:\archive\scans" --quality 82 --max-size 1920
 ```
 
-Optional CLI flags: `--output-dir PATH`, `--keep-metadata`, `--quantize-png`, and `--copy-non-images`.
+Available options:
 
-## Tests
+| Option | Description |
+| --- | --- |
+| `--quality 60-95` | JPEG/WebP quality; defaults to `82`. |
+| `--max-size PIXELS` | Fit images within this maximum width and height; resizing is off by default. |
+| `--output-dir PATH` | Save output folders in an existing directory. |
+| `--keep-metadata` | Preserve EXIF metadata; metadata is stripped by default. |
+| `--quantize-png` | Reduce PNGs to a palette of up to 256 colors. |
+| `--copy-non-images` | Copy non-image files into the output folder. |
+
+## Compression details
+
+- JPEGs are optimized and saved progressively; WebP images use the selected quality and encoder optimization.
+- PNGs use lossless optimization unless color quantization is enabled.
+- Supported formats are JPEG, PNG, and WebP. Install `pillow-heif` to add HEIC/HEIF support:
+  ```powershell
+  python -m pip install pillow-heif
+  ```
+- Unsupported files are skipped unless **Copy non-image files** is enabled. Corrupt images are reported without stopping the whole batch.
+- Folder processing uses worker processes to handle images concurrently.
+
+## Run tests
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
+
+## Generated files
+
+Compressed output is written to `compressed folder/` in this workspace, and that directory is excluded by `.gitignore`. Keep generated image batches out of Git; the screenshots and sample before/after images above are separate files used by this README.
